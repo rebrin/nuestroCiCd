@@ -1,0 +1,30 @@
+# .github/workflows/cd.yml
+name: CD - Desplegar a Render
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    name: Desplegar en Render
+    runs-on: ubuntu-latest
+
+    steps:
+      # Opcional pero recomendado: corre las pruebas antes de desplegar
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar pruebas
+        run: npm test
+
+      # Este es el paso mágico que despliega en Render
+      - name: Trigger Render Deploy
+        env:
+          DEPLOY_URL: ${{ secrets.DEPLOY_HOOK }}
+        run: |
+          curl -X POST "$DEPLOY_URL"
+          echo "Despliegue iniciado! https://nuestrocicd.onrender.com "
